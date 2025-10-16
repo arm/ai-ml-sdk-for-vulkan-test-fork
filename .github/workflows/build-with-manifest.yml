@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
 # SPDX-License-Identifier: Apache-2.0
 #
-name: Build
+name: Build ML SDK
 
 on:
   workflow_dispatch:
@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/arm/ml-sdk-linux-amd64:latest
@@ -29,7 +28,7 @@ jobs:
       REPO_DIR: ${{ github.workspace }}/sdk
 
     steps:
-      - name: Clone repositories
+      - name: Clone repositories and build
         run: |
           mkdir -p $REPO_DIR && cd $REPO_DIR
 
@@ -37,22 +36,17 @@ jobs:
           repo init -u $MANIFEST_URL
           repo sync --no-clone-bundle -j $(nproc)
 
-      - name: Build VGF-Lib
-        working-directory: $REPO_DIR/sw/vgf-lib
-        run: ./scripts/build.py -j $(nproc)
+          # Build VGF-Lib
+          ./sw/vgf-lib/scripts/build.py -j $(nproc) --doc --test
 
-      - name: Build Model Converter
-        working-directory: $REPO_DIR/sw/model-converter
-        run: ./scripts/build.py -j $(nproc)
+          # Build Model Converter
+          ./sw/model-converter/scripts/build.py -j $(nproc) --doc --test
 
-      - name: Build Emulation Layer
-        working-directory: $REPO_DIR/sw/emulation-layer
-        run: ./scripts/build.py -j $(nproc)
+          # Build Emulation Layer
+          ./sw/emulation-layer/scripts/build.py -j $(nproc) --doc --test
 
-      - name: Build Scenario Runner
-        working-directory: $REPO_DIR/sw/scenario-runner
-        run: ./scripts/build.py -j $(nproc)
+          # Build Scenario Runner
+          ./sw/scenario-runner/scripts/build.py -j $(nproc) --doc --test
 
-      - name: Build SDK Root
-        working-directory: $REPO_DIR
-        run: ./scripts/build.py -j $(nproc) --doc
+          # Build SDK Root
+          ./scripts/build.py -j $(nproc) --doc
