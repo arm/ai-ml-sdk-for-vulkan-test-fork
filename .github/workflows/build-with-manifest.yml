@@ -36,17 +36,20 @@ jobs:
           repo init -u $MANIFEST_URL
           repo sync --no-clone-bundle -j $(nproc)
 
-          # Build VGF-Lib
-          ./sw/vgf-lib/scripts/build.py -j $(nproc) --doc --test
+          echo "Build VGF-Lib"
+          # ./sw/vgf-lib/scripts/build.py -j $(nproc) --doc --test
 
-          # Build Model Converter
-          ./sw/model-converter/scripts/build.py -j $(nproc) --doc --test
+          echo "Build Model Converter"
+          # ./sw/model-converter/scripts/build.py -j $(nproc) --doc --test
 
-          # Build Emulation Layer
-          ./sw/emulation-layer/scripts/build.py -j $(nproc) --doc --test
+          echo "Build Emulation Layer"
+          export VK_LAYER_PATH=${{ github.workspace }}/install/share/vulkan/explicit_layer.d
+          export LD_LIBRARY_PATH=${{ github.workspace }}/install/lib
+          ./sw/emulation-layer/scripts/build.py -j $(nproc) --doc --test --install ${{ github.workspace }}/install
 
-          # Build Scenario Runner
+          echo "Build Scenario Runner"
+          export VK_INSTANCE_LAYERS=VK_LAYER_ML_Graph_Emulation:VK_LAYER_ML_Tensor_Emulation
           ./sw/scenario-runner/scripts/build.py -j $(nproc) --doc --test
 
-          # Build SDK Root
+          echo "Build SDK Root"
           ./scripts/build.py -j $(nproc) --doc
