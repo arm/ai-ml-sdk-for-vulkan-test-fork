@@ -23,6 +23,7 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+      options: --user root
     env:
       MANIFEST_URL: https://github.com/arm/ai-ml-sdk-manifest.git
       REPO_DIR: ${{ github.workspace }}/sdk
