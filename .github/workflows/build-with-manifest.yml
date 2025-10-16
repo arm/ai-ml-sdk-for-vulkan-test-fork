@@ -18,23 +18,24 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/arm/ml-sdk-linux-amd64:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     env:
       MANIFEST_URL: https://github.com/arm/ai-ml-sdk-manifest.git
       REPO_DIR: sdk
 
     steps:
-      - name: Clone repositories
-        run: |
-          mkdir -p $REPO_DIR && cd $REPO_DIR
+      - name: Run build in container
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/arm/ml-sdk-linux-amd64:latest
+          options: -v ${{ github.workspace }}:/src -w /src
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            mkdir -p $REPO_DIR && cd $REPO_DIR
 
-          # Initialize the default manifest state
-          repo init -u $MANIFEST_URL
-          repo sync --no-clone-bundle -j $(nproc)
+            # Initialize the default manifest state
+            repo init -u $MANIFEST_URL
+            repo sync --no-clone-bundle -j $(nproc)
 
       - name: Build VGF-Lib
         working-directory: $REPO_DIR/sw/vgf-lib
