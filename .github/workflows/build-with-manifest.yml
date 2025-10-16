@@ -28,9 +28,6 @@ jobs:
       REPO_DIR: sdk
 
     steps:
-      - name: Checkout this repo
-        uses: actions/checkout@v4
-
       - name: Clone repositories
         run: |
           mkdir -p $REPO_DIR && cd $REPO_DIR
