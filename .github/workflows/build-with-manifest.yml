@@ -40,22 +40,23 @@ jobs:
           repo init -u $MANIFEST_URL
           repo sync --no-clone-bundle -j $(nproc)
 
-          if [ -z "$CHANGED_REPO" ]; then
+          if [ -n "$CHANGED_REPO" ]; then
             sudo apt-get update
             sudo apt-get install -y xmlstarlet
 
             # Create a local manifest override to pin the changed repo to the exact SHA
             mkdir -p .repo/local_manifests
             cat > .repo/local_manifests/override.xml <<EOF
-            <manifest>
-              <project name="${CHANGED_REPO}" revision="${CHANGED_SHA}"/>
-            </manifest>
-            EOF
+<manifest>
+  <project name="${CHANGED_REPO}" revision="${CHANGED_SHA}"/>
+</manifest>
+EOF
 
             # Re-sync the changed project to the specified SHA
             PROJECT_PATH=$(repo manifest -r | xmlstarlet sel -t -v "//project[@name='${CHANGED_REPO}']/@path")
             if [ -z "$PROJECT_PATH" ]; then
-              echo "Could not find project path for ${CHANGED_REPO} in manifest"; exit 1
+              echo "Could not find project path for ${CHANGED_REPO} in manifest"
+              exit 1
             fi
             echo "Changed project path: $PROJECT_PATH"
             repo sync -j $(nproc) --force-sync "$PROJECT_PATH"
