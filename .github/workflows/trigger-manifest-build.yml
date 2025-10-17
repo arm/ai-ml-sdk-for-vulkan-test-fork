@@ -11,7 +11,7 @@ on:
 
 jobs:
   call:
-    uses: .github/workflows/build-with-manifest.yml
+    uses: .github/workflows/build-with-manifest.yml@ci_test
     permissions:
       contents: read
     with:
