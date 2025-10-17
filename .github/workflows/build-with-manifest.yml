@@ -40,42 +40,30 @@ jobs:
           repo init -u $MANIFEST_URL
           repo sync --no-clone-bundle -j $(nproc)
 
-          if [ -n "$CHANGED_REPO" ]; then
-            sudo apt-get update
-            sudo apt-get install -y xmlstarlet
+          # if [ -n "$CHANGED_REPO" ]; then
+          sudo apt-get update
+          sudo apt-get install -y xmlstarlet
 
-            # Create a local manifest override to pin the changed repo to the exact SHA
-            mkdir -p .repo/local_manifests
-            cat > .repo/local_manifests/override.xml <<EOF
-            <manifest>
-              <project name="${CHANGED_REPO}" revision="${CHANGED_SHA}"/>
-            </manifest>
-            EOF
-            cat .repo/local_manifests/override.xml
+          # Create a local manifest override to pin the changed repo to the exact SHA
+          mkdir -p .repo/local_manifests
+          cat > .repo/local_manifests/override.xml <<EOF
+          <manifest>
+            <project name="${CHANGED_REPO}" revision="${CHANGED_SHA}"/>
+          </manifest>
+          EOF
+          cat .repo/local_manifests/override.xml
 
-            # Re-sync the changed project to the specified SHA
-            PROJECT_PATH=$(repo manifest -r | xmlstarlet sel -t -v "//project[@name='${CHANGED_REPO}']/@path")
-            if [ -z "$PROJECT_PATH" ]; then
-              echo "Could not find project path for ${CHANGED_REPO} in manifest"
-              exit 1
-            fi
-            echo "Changed project path: $PROJECT_PATH"
-            repo sync -j $(nproc) --force-sync "$PROJECT_PATH"
+          # Re-sync the changed project to the specified SHA
+          PROJECT_PATH=$(repo manifest -r | xmlstarlet sel -t -v "//project[@name='${CHANGED_REPO}']/@path")
+          if [ -z "$PROJECT_PATH" ]; then
+            echo "Could not find project path for ${CHANGED_REPO} in manifest"
+            exit 1
           fi
-
+          echo "Changed project path: $PROJECT_PATH"
+          repo sync -j $(nproc) --force-sync "$PROJECT_PATH"
+          # fi
           echo "Build VGF-Lib"
           # ./sw/vgf-lib/scripts/build.py -j $(nproc) --doc --test
-
           echo "Build Model Converter"
           # ./sw/model-converter/scripts/build.py -j $(nproc) --doc --test
-
-          echo "Build Emulation Layer"
-          # export VK_LAYER_PATH=$INSTALL_DIR/share/vulkan/explicit_layer.d
-          # export LD_LIBRARY_PATH=$INSTALL_DIR/lib
-          # ./sw/emulation-layer/scripts/build.py -j $(nproc) --doc --test --install $INSTALL_DIR
-
-          echo "Build Scenario Runner"
-          # export VK_INSTANCE_LAYERS=VK_LAYER_ML_Graph_Emulation:VK_LAYER_ML_Tensor_Emulation
-          # ./sw/scenario-runner/scripts/build.py -j $(nproc) --doc --test
-
           echo "Build SDK Root"
