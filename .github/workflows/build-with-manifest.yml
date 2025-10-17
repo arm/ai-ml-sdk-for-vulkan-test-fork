@@ -40,7 +40,7 @@ jobs:
           repo init -u $MANIFEST_URL
           repo sync --no-clone-bundle -j $(nproc)
 
-          if [ "${{ github.event_name }}" == 'workflow_call' ]; then
+          if [ -z "$CHANGED_REPO" ]; then
             sudo apt-get update
             sudo apt-get install -y xmlstarlet
 
