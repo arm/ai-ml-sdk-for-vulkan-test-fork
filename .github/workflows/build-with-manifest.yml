@@ -43,7 +43,6 @@ jobs:
           if [ -n "$CHANGED_REPO" ]; then
             sudo apt-get update
             sudo apt-get install -y xmlstarlet
-
             # Create a local manifest override to pin the changed repo to the exact SHA
             mkdir -p .repo/local_manifests
             cat > .repo/local_manifests/override.xml <<EOF
@@ -51,7 +50,6 @@ jobs:
               <project name="${CHANGED_REPO}" revision="${CHANGED_SHA}"/>
             </manifest>
             EOF
-
             # Re-sync the changed project to the specified SHA
             PROJECT_PATH=$(repo manifest -r | xmlstarlet sel -t -v "//project[@name='${CHANGED_REPO}']/@path")
             if [ -z "$PROJECT_PATH" ]; then
