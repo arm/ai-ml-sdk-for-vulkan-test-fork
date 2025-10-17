@@ -12,8 +12,6 @@ on:
 jobs:
   call:
     uses: ./.github/workflows/build-with-manifest.yml
-    permissions:
-      contents: read
     with:
       changed_repo: arm/ai-ml-sdk-for-vulkan
       changed_sha:  ${{ github.sha }}
